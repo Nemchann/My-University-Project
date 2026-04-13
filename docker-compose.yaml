@@ -47,6 +47,16 @@ services:
     ports:
       - "5435:5432"
 
+  notification-db:
+    image: mongo:latest
+    container_name: notification-db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DB_NAME}
+    ports:
+      - "27017:27017"
+
   user-service:
     build: ./user-service
     container_name: user-service
@@ -95,4 +105,29 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${COMMON_DB_PASSWORD:-secret}
     ports:
       - "8084:8084"
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    depends_on:
+      - notification-db
+      - rabbitmq
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@notification-db:27017/${MONGO_DB_NAME}?authSource=admin
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_USERNAME=${MONGODB_USER}
+      - SPRING_RABBITMQ_PASSWORD=${MONGODB_PASSWORD}
+    ports:
+      - "8085:8085"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${MONGODB_USER}
+      - RABBITMQ_DEFAULT_PASS=${MONGODB_PASSWORD}
+    ports:
+      - "5672:5672"   # Порт для обмена сообщениями
+      - "15672:15672"
+
 
