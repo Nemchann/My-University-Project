@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    # 'user-db' — это имя из твоего главного docker-compose
+    url: jdbc:postgresql://fitness-db:5432/${POSTGRES_DB:fitness_club}
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:secret}
+  jpa:
+    hibernate:
+      # validate просто проверит, что твои Java-классы соответствуют таблицам в БД.
+      # Если написать update или create, Hibernate может изменить твою структуру.
+      ddl-auto: validate
