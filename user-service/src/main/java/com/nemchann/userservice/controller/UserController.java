@@ -21,8 +21,9 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
-        // Здесь в будущем добавишь PasswordEncoder из Spring Security
         User savedUser = userRepository.save(user);
         return ResponseEntity.ok(savedUser);
     }
+
+
 }
